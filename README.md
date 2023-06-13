@@ -2,7 +2,7 @@
 
 # Data Origami
 
-Data Origami is going to be a minimal python tool for designing data model and exposing it via API at the speed of light. The magic happens behind the scene leveraging the power of Generative Language Models.
+Data Origami is going to be a minimal python tool for designing data model and exposing it via API at the speed of light. It uses LLM to generate the data model (.prisma) based on user requirements, then it will Python Prisma library and Fast API to dynamically create the API to serve the data. 
 
 ```
 Let's get started! What is the focus of your data model? Which entities or users do you want to focus on?
@@ -113,7 +113,6 @@ model VenueOwner {
 }
 ```
 
-This is just a rough draft, and we can refine it further based on your requirements. Do you have any questions or suggestions?
 ## Visions
 - Bootstraping the base design based on the requirements.
 - Helping to clear out the requirements by asking multiple questions.
@@ -126,13 +125,8 @@ This is just a rough draft, and we can refine it further based on your requireme
 
 ### CLI
 ```shell
-origami req 
+manage.py gather # a chatbot to desgin and generate the datamodel by interviewing the user 
 
-origami model 
-
-origami data
-
-origami code
 ```
 
 ## Design
