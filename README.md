@@ -127,6 +127,7 @@ model VenueOwner {
 ```shell
 manage.py gather # a chatbot to desgin and generate the datamodel by interviewing the user 
 
+manage.py model # print the name of generate models.
 ```
 
 ## Design

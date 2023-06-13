@@ -6,3 +6,4 @@ tiktoken
 openai
 faiss-cpu
 pytesseract
+prisma
