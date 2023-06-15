@@ -127,29 +127,35 @@ model VenueOwner {
 ```shell
 manage.py gather # a chatbot to desgin and generate the datamodel by interviewing the user 
 
-manage.py model # print the name of generate models.
+manage.py model # print the name of generated models.
+
+manage.py data # create few sample data for all entities defined by datamodel.
 ```
 
 ## Design
-The project includes three domain each one containing different entities. Command line interfce provide tools for managing and translating these entities.
-<-> Requirements in plain text 
+The project includes three realm each one containing different entities. Command line interfce provide tools for managing and translating these entities.
+<-> Conversations between users and AI agent. Conversations are used as the main requirements for the desing.
 <-> Data Model in a declarative language + Sample Data 
 <-> Static or dyanamic code generation
 
-### Requirements  
-In a specific layout(?), written and maintained in Markdown.
-- Layout
-	- Summary
-	- User stories
-	- Users
-	- Entities
-- reqs.md <=> models.prisma
-	- Updateing the req file via CLI 
-		- update the model to reflect the changes.
-	- editing the .prisma
-		- update the req file
-	- using diff or the whole file?
-- A workflow to clarify and expand the model.
+### Conversation  
+conversation are the core assets of a Origami project and kept and maintainted as a part of the source code.
+- They are representing the conversation that can happen in a requirement gathering or analysing and desiging session.
+- They contain enough information for generating the final datamodel and API.
+- They can be converted to different format for ease of read.
+- They are usually generated or manipulated with the command line tools which powered by LLMs.
+
+#### File format
+A Domain Specific Language to store LLMs chat data. It's very simple for now.
+I want to call it Talk Flow :)
+
+```talkflow
+User: Hello, how are you?
+User: Can you recommend a good restaurant nearby?
+Assistant: Sure! What type of cuisine are you interested in?
+User: I'm in the mood for Italian food.
+Assistant: There's a great Italian restaurant called 'Pasta Paradise' nearby. Would you like more information?
+```
 
 
 ### Data model and sample data
@@ -160,8 +166,6 @@ Using Prisma Python as the ORM and FastAPI to dynamically create the APIs.
 
 
 ### Tasks
-- reqs.md <=> models.prisma
-	- Expriement with OpenAI API to develop a requirement (in plain English) to datamodel (.Prisma) model. 
-	- Find an efficient requirement layout.
-- Develop a workflow for expanding the requirements
+- create a data format or layout for conversation files.
+- create tools managing the conversatoin files.
 

@@ -1,35 +1,11 @@
+
+from commands.Talk import Conversation, Talk
 import os
-import openai
-from dotenv import load_dotenv, find_dotenv
-_ = load_dotenv(find_dotenv()) # read local .env file
-
-openai.api_key  = os.getenv('OPENAI_API_KEY')
-
-def get_completion(prompt, model="gpt-3.5-turbo"):
-    messages = [{"role": "user", "content": prompt}]
-    response = openai.ChatCompletion.create(
-        model=model,
-        messages=messages,
-        temperature=1, # this is the degree of randomness of the model's output
-    )
-    return response.choices[0].message["content"]
-
-def get_completion_from_messages(messages, model="gpt-3.5-turbo", temperature=0):
-    response = openai.ChatCompletion.create(
-        model=model,
-        messages=messages,
-        temperature=temperature, # this is the degree of randomness of the model's output
-    )
-#     print(str(response.choices[0].message))
-    return response.choices[0].message["content"]
-
-
 def save_data_model(data_model_str):
     with open('./data/datamodel.prisma', 'w+',encoding='utf-8') as fn:
         fn.write(data_model_str)
     
 def gather_command(args):
-    description = "A platform similar to Resident Advisor that provides information about upcoming music events, festivals, and concerts. The platform would allow users to search for events by location, genre, and date, and would provide detailed information about each event, including the lineup, venue, and ticket prices. Users could also create profiles to track their favorite artists and receive personalized recommendations for events based on their music preferences. The platform could generate revenue through ticket sales and partnerships with event organizers and sponsors. "
     role_prompt = """
     You are OrigamiAnalyzer, a AI powered command line tool designed to gather DATA MODEL SPECIFICATION from the client.  \
     You and client will work together by having a conversation cosidering followin points:
@@ -54,32 +30,44 @@ def gather_command(args):
     - The relationship and interaction of users with Entities.
 
     """
-    context = [ {'role':'system', 'content': role_prompt},
-    {'role':'assistant','content':'Hi I am OrigamiAnalyzer! We will be working to together to analyes users stories of your desire project to design the data model. please provide me the first user story.'},
-    ]  # accumulate messages
 
-    print(context)
+    conversation = Conversation(filepath= 'requirements.talk')
+    conversation.config(role_prompt)
+    conversation.load()
+    if not len(conversation):
+        conversation.assistant('Hi I am OrigamiAnalyzer! We will be working to together to analyes users stories of your desire project to design the data model. please provide me the first user story.')
+    
+    talk = Talk(conversation)
     exit_conditions = (":q", "quit", "exit")
-    output_conditions = (":output",)
+    output_conditions = ("datamodel:prisma","sample:json")
 
     while True:
         user_prompt = input("> ")
         if user_prompt in exit_conditions:
             break
         elif user_prompt in output_conditions:
-            output_context = context.copy()
-            output_context.append({'role':'system','content':'Output the designed data model in .prisma format'})
-            response = get_completion_from_messages(output_context)
-            print("")
-            print(f"{response}")
-            try:
-                prisma_str = response.split("```")[1]
-                save_data_model(prisma_str)
-            except IndexError:
-                pass
+            if user_prompt == "datamodel:prisma":
+                response = talk.command(['Output the designed data model in .prisma format'])
+                print("")
+                print(f"{response}")
+                try:
+                    prisma_str = response.split("```")[1]
+                    save_data_model(prisma_str)
+                except IndexError:
+                    pass
+            elif user_prompt == "sample:json":
+                commands = [
+                    'Output the designed data model in .prisma format',
+                    'Output few sample data for each entity in the generated .prisma model.The format should be JSON'
+                ]
+                response = talk.command(commands)
+                print("")
+                print(f"{response}")
+                try:
+                    json_str = response.split("```")[1]
+                except IndexError:
+                    pass
                 
         else:
-            context.append({'role':'user','content':user_prompt})
-            response = get_completion_from_messages(context)
-            context.append({'role':'assistant','content':response})
+            response = talk.talk(user_prompt)
             print(f"🪴 {response}")
