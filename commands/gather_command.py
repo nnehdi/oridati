@@ -1,10 +1,16 @@
 
 from commands.Talk import Conversation, Talk
 import os
+import json
+
 def save_data_model(data_model_str):
-    with open('./data/datamodel.prisma', 'w+',encoding='utf-8') as fn:
+    with open('./schema.prisma', 'w+', encoding='utf-8') as fn:
         fn.write(data_model_str)
-    
+
+def save_samples(json_str):
+    with open('./samples.json', 'w+', encoding='utf-8') as fn:
+        fn.write(json.dumps(json.loads(json_str)))
+
 def gather_command(args):
     role_prompt = """
     You are OrigamiAnalyzer, a AI powered command line tool designed to gather DATA MODEL SPECIFICATION from the client.  \
@@ -30,24 +36,31 @@ def gather_command(args):
     - The relationship and interaction of users with Entities.
 
     """
+    OUTPUT_JSON_COMMAND = """
+    Output few sample data for each entity in the generated .prisma model. 
+    Use the exact naming for Entities and their attributes.
+    Fill in id's and foreign keys to represent the relationship between the entities.
+    It output should be a series of prisma create query. 
 
-    conversation = Conversation(filepath= 'requirements.talk')
+    """
+    conversation = Conversation(filepath='requirements.md')
     conversation.config(role_prompt)
     conversation.load()
     if not len(conversation):
-        conversation.assistant('Hi I am OrigamiAnalyzer! We will be working to together to analyes users stories of your desire project to design the data model. please provide me the first user story.')
-    
+        conversation.assistant(
+            'Hi I am OrigamiAnalyzer! We will be working to together to analyes users stories of your desire project to design the data model. please provide me the first user story.')
     talk = Talk(conversation)
     exit_conditions = (":q", "quit", "exit")
-    output_conditions = ("datamodel:prisma","sample:json")
-
+    output_conditions = ("datamodel:prisma", "sample:json")
+    talk.complete()
     while True:
         user_prompt = input("> ")
         if user_prompt in exit_conditions:
             break
         elif user_prompt in output_conditions:
             if user_prompt == "datamodel:prisma":
-                response = talk.command(['Output the designed data model in .prisma format'])
+                response = talk.talk(
+                    ['Output the designed data model in .prisma format'])
                 print("")
                 print(f"{response}")
                 try:
@@ -57,17 +70,17 @@ def gather_command(args):
                     pass
             elif user_prompt == "sample:json":
                 commands = [
-                    'Output the designed data model in .prisma format',
-                    'Output few sample data for each entity in the generated .prisma model.The format should be JSON'
+                    'Output the designed data model in .prisma format', OUTPUT_JSON_COMMAND
                 ]
-                response = talk.command(commands)
+                response = talk.talk(commands)
                 print("")
                 print(f"{response}")
                 try:
                     json_str = response.split("```")[1]
+                    save_samples(json_str)
                 except IndexError:
                     pass
-                
+
         else:
             response = talk.talk(user_prompt)
             print(f"🪴 {response}")

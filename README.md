@@ -1,7 +1,7 @@
 **PROOF OF CONCEPT**
 
 # Data Origami
-
+Rquirements part of the code base
 Data Origami is going to be a minimal python tool for designing data model and exposing it via API at the speed of light. It uses LLM to generate the data model (.prisma) based on user requirements, then it will Python Prisma library and Fast API to dynamically create the API to serve the data. 
 
 ```
@@ -161,11 +161,15 @@ Assistant: There's a great Italian restaurant called 'Pasta Paradise' nearby. Wo
 ### Data model and sample data
 schemas are defined in .Prisma format. Examples are in .json format.
 
+#### File format
+I'm using .prisma and .json format for models and data.
+but I'm thinking to create a more concise format to present both models and samples.
+[User(id=3, name='mehdi', email='mehdi@example.com', password='something', location='somewhere', events=None), User(id=4, name='mehdi4', email='mehdi4@example.com', password='something', location='somewhere', events=None)]
+
 ### Code
 Using Prisma Python as the ORM and FastAPI to dynamically create the APIs.
 
 
 ### Tasks
-- create a data format or layout for conversation files.
-- create tools managing the conversatoin files.
+- generate data sample and write it into database
 

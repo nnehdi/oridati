@@ -11,29 +11,33 @@ generator client {
   recursive_type_depth = 5
   interface            = "sync"
 }
+
 model User {
-  id          Int      @id @default(autoincrement())
-  username    String
-  email       String   @unique
-  password    String
-  location    String?
-  profilePic  String?
-  bio         String?
-  socialLinks String?
-  paymentInfo String?
-  role        String
-  beats       Beat[]
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  location  String
+  events    Event[]  @relation("Attendee")
 }
 
-model Beat {
+model Event {
+  id          Int       @id @default(autoincrement())
+  name        String
+  date        DateTime
+  time        String
+  location    String
+  description String
+  ticketPrice Float
+  capacity    Int
+  artists     Artist[] @relation("Performer")
+  attendees   User[]   @relation("Attendee")
+}
+
+model Artist {
   id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  genre       String?
-  price       Float
-  duration    Int?
-  file        String
-  dateCreated DateTime @default(now())
-  seller      User     @relation(fields: [sellerId], references: [id])
-  sellerId    Int
+  name        String
+  genre       String
+  description String
+  events      Event[]  @relation("Performer")
 }

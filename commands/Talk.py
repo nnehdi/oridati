@@ -28,35 +28,34 @@ class Conversation:
         current_content = ""
 
         for line in lines:
-            line = line.strip()
+            line = line
 
-            if line.startswith("user:"):
+            if line.startswith("### user"):
                 if current_role:
-                    self._messages.append({'role':current_role, 'content':current_content.strip()})
+                    self._messages.append({'role':current_role, 'content':current_content})
                     current_content = ""
 
                 current_role = "user"
-                current_content += line[len("user:"):].strip()
 
-            elif line.startswith("assistant:"):
+            elif line.startswith("### assistant"):
                 if current_role:
                     self._messages.append({'role':current_role, 'content':current_content.strip()})
                     current_content = ""
 
                 current_role = "assistant"
-                current_content += line[len("assistant:"):].strip()
-            elif line.startswith("system:"):
+
+            elif line.startswith("### system"):
                 if current_role:
                     self._messages.append({'role':current_role, 'content':current_content.strip()})
                     current_content = ""
 
                 current_role = "system"
-                current_content += line[len("system:"):].strip()
+
             else:
-                current_content += line.strip()
+                current_content += line
 
         if current_role:
-            self._messages.append({'role':current_role, 'content':current_content.strip()})
+            self._messages.append({'role':current_role, 'content':current_content})
         
         print(self._messages)
         return True
@@ -64,8 +63,8 @@ class Conversation:
     def save(self):
         with open(self._filepath, 'w+') as file:
             for msg in self._messages:
-                if not msg['role'] == 'system':
-                    file.write(f"{msg['role']}: {msg['content']}\n")
+                if msg != '\n':
+                    file.write(f"### {msg['role']}\n{msg['content']}\n")
 
     def __len__(self):
         return len(self._messages)
@@ -113,19 +112,15 @@ class Talk:
         self._model = ModelAdapter()
         self._autosave = autosave
 
-    def talk(self, prompt):
-        self._conversation.user(prompt)
+    def talk(self, prompt=None):
+        if prompt:
+            self._conversation.user(prompt)
         response = self._model.get_completion(self._conversation)
         self._conversation.assistant(response)
         if self._autosave:
             self._conversation.save()
         return response
     
-    def command(self, system_prompts):
-        temp_conv = copy.copy(self._conversation)
-        response = None
-        for system_prompt in system_prompts:
-            temp_conv.system(system_prompt)
-            response =  self._model.get_completion(temp_conv)
-            temp_conv.assistant(response)
-        return response
+    def complete(self):
+        if self._conversation[-1]['role'] != 'assistant':
+            self.talk()
