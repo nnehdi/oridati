@@ -4,7 +4,7 @@ import inspect
 
 class PrismaAdapter:
     def __init__(self):
-        self._prisma = Prisma(auto_register=True)
+        self._prisma = Prisma()
         self._models = dict()
 
     def find_models(self):
@@ -17,17 +17,43 @@ class PrismaAdapter:
                 self._models[name] = obj
         return list(self._models.values())
 
-    def find_all(self, model):
+    def _db(self, model):
+        return getattr(self._prisma, model.__name__.lower())
+    
+    def find_by_id(self,model,  id):
         self._prisma.connect()
-        res = model.prisma().find_many()
+        res = self._db(model).find_first(
+            where = {
+                'id': id
+            }
+        )
         self._prisma.disconnect()
         return res
 
-    def create(self, model, data):
+    def find_all(self, model):
         self._prisma.connect()
-        model.prisma().create(data)
+        res = self._db(model).find_many()
         self._prisma.disconnect()
+        return res
 
+    def create(self, model,id, object):
+        obj_dict = dict()
+        obj_dict['id'] = id
+        for key, value in dict(object).items():
+            if value and not isinstance(value,(list,dict)):
+                obj_dict[key] = value
+
+        res = None
+        self._prisma.connect()
+        res =  self._db(model).create(dict(obj_dict))
+        self._prisma.disconnect()
+        return res
+    def delete(self, model, id):
+        self._prisma.connect()
+        res = self._db(model).delete(where={'id':id})
+        self._prisma.disconnect()
+        return res
+    
     def get_model(self, model_name):
         return self._models[model_name]
 
@@ -43,10 +69,10 @@ class PrismaAdapter:
                 for key, value in record.items():
                     if isinstance(value,(list,dict)):
                         record.pop(key)
-                self.get_model(model_name).prisma().create(record)
+                getattr(self._prisma,model_name.lower()).create(record)
             else: # command == 'update':  
                 print(f'updating {record}')
-                self.get_model(model_name).prisma().update(where = record['where'],data=record['data'])
+                getattr(self._prisma,model_name.lower()).update(where = record['where'],data=record['data'])
         batcher.commit()
         self._prisma.disconnect()
 
