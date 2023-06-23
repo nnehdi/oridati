@@ -33,5 +33,6 @@ def do(args):
             elif user_prompt == "sample:json":
                 talk.generate_samples()
         else:
+            user_prompt += '\n'
             response = talk.talk(user_prompt)
             print(f"🪴 {response}")

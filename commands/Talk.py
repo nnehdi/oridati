@@ -45,7 +45,7 @@ class Conversation:
             elif line.startswith("### assistant"):
                 if current_role:
                     self._messages.append(
-                        {'role': current_role, 'content': current_content.strip()})
+                        {'role': current_role, 'content': current_content})
                     current_content = ""
 
                 current_role = "assistant"
@@ -53,7 +53,7 @@ class Conversation:
             elif line.startswith("### system"):
                 if current_role:
                     self._messages.append(
-                        {'role': current_role, 'content': current_content.strip()})
+                        {'role': current_role, 'content': current_content})
                     current_content = ""
 
                 current_role = "system"
@@ -71,8 +71,8 @@ class Conversation:
     def save(self):
         with open(self._filepath, 'w+') as file:
             for msg in self._messages:
-                if msg != '\n':
-                    file.write(f"### {msg['role']}\n{msg['content']}\n")
+                if msg['role'] != 'system':
+                    file.write(f"### {msg['role']}\n{msg['content']}")
 
     def __len__(self):
         return len(self._messages)
