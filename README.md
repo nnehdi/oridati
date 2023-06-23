@@ -14,12 +14,12 @@ manage.py talk --complete
 ``` 
 2. Generate the schema.prisma file, as well as the orm code. Then reflect the changes on the database.
 ```shell
-manage.py generate-schema
+manage.py talk --generate-schema
 prisma db push
 ``` 
 3. Generate some sample data and insert them into the database.
 ```shell
-manage.py generate-data
+manage.py talk --generate-data
 ``` 
 4. Launch daynamically created FastAPI app exposes endpoints for performing CRUD operation on different entities in the introduced datamodel. You can see an interactive OpenAPI documentaion by going to '/docs' path.
 ```shell

@@ -1,12 +1,28 @@
 
 from commands.Talk import DataModelDesignerTalk
 
-def talk_command(args):
+class TalkCommand:
+    def __init__(self,root_parser): 
+        talk_parser = root_parser.add_parser('talk', help="A chatbot to design and generate the datamodel by interviewing the client!")
+        talk_parser.add_argument('--complete', action='store_true')
+        talk_parser.add_argument('--generate-datamodel', action='store_true')
+        talk_parser.add_argument('--generate-samples', action='store_true')
+        talk_parser.set_defaults(func=do)
 
+def do(args):
     talk = DataModelDesignerTalk(filepath='requirements.md')
+    if args.complete:
+        talk.complete()
+        return
+    elif args.generate_datamodel:
+        talk.save_data_model()
+        return 
+    elif args.generate_samples:
+        talk.save_samples()
+        return 
+    
     exit_conditions = (":q", "quit", "exit")
     output_conditions = ("datamodel:prisma", "sample:json")
-    talk.complete()
     while True:
         user_prompt = input("> ")
         if user_prompt in exit_conditions:
