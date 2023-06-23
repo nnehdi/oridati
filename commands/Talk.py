@@ -3,6 +3,7 @@ import openai
 import copy
 import warnings
 import json
+from data.PrismaAdapter import PrismaAdapter
 
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())  # read local .env file
@@ -200,7 +201,7 @@ class DataModelDesignerTalk(BaseTalk):
         with open('./schema.prisma', 'w+', encoding='utf-8') as fn:
             fn.write(data_model_str)
 
-    def save_samples(self):
+    def generate_samples(self):
         response = self.talk(self.OUTPUT_SAMPLES_COMMAND)
         print("")
         print(f"{response}")
@@ -210,3 +211,7 @@ class DataModelDesignerTalk(BaseTalk):
             pass
         with open('./samples.json', 'w+', encoding='utf-8') as fn:
             fn.write(json.dumps(json.loads(json_str)))
+        
+        adapter = PrismaAdapter()
+        with open('samples.json', 'r') as fn:
+            adapter.create_samples(json.loads(fn.read()))

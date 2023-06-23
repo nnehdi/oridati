@@ -18,7 +18,7 @@ def do(args):
         talk.save_data_model()
         return 
     elif args.generate_samples:
-        talk.save_samples()
+        talk.generate_samples()
         return 
     
     exit_conditions = (":q", "quit", "exit")
@@ -31,7 +31,7 @@ def do(args):
             if user_prompt == "datamodel:prisma":
                 talk.save_data_model()
             elif user_prompt == "sample:json":
-                talk.save_samples()
+                talk.generate_samples()
         else:
             response = talk.talk(user_prompt)
             print(f"🪴 {response}")

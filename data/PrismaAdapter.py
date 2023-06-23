@@ -66,10 +66,11 @@ class PrismaAdapter:
             print(f'processing {command} : {model_name}')
             if command == 'create':  
                 print(f'creating {record}')
+                clean_record = dict()
                 for key, value in record.items():
-                    if isinstance(value,(list,dict)):
-                        record.pop(key)
-                getattr(self._prisma,model_name.lower()).create(record)
+                    if not isinstance(value,(list,dict)):
+                        clean_record[key] = value
+                getattr(self._prisma,model_name.lower()).create(clean_record)
             else: # command == 'update':  
                 print(f'updating {record}')
                 getattr(self._prisma,model_name.lower()).update(where = record['where'],data=record['data'])
