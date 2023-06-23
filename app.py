@@ -1,4 +1,4 @@
-from PrismaAdapter import PrismaAdapter
+from data.PrismaAdapter import PrismaAdapter
 from fastapi import FastAPI, APIRouter, Depends
 
 
