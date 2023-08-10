@@ -6,9 +6,10 @@ import json
 from data.PrismaAdapter import PrismaAdapter
 
 from dotenv import load_dotenv, find_dotenv
+
 _ = load_dotenv(find_dotenv())  # read local .env file
 
-openai.api_key = os.getenv('OPENAI_API_KEY')
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 class Conversation:
@@ -24,7 +25,7 @@ class Conversation:
 
         warnings.warn(f"Loading file from {self._filepath}!")
         try:
-            with open(self._filepath, 'r') as file:
+            with open(self._filepath, "r") as file:
                 lines = file.readlines()
         except OSError:
             lines = list()
@@ -37,7 +38,8 @@ class Conversation:
             if line.startswith("### user"):
                 if current_role:
                     self._messages.append(
-                        {'role': current_role, 'content': current_content})
+                        {"role": current_role, "content": current_content}
+                    )
                     current_content = ""
 
                 current_role = "user"
@@ -45,7 +47,8 @@ class Conversation:
             elif line.startswith("### assistant"):
                 if current_role:
                     self._messages.append(
-                        {'role': current_role, 'content': current_content})
+                        {"role": current_role, "content": current_content}
+                    )
                     current_content = ""
 
                 current_role = "assistant"
@@ -53,7 +56,8 @@ class Conversation:
             elif line.startswith("### system"):
                 if current_role:
                     self._messages.append(
-                        {'role': current_role, 'content': current_content})
+                        {"role": current_role, "content": current_content}
+                    )
                     current_content = ""
 
                 current_role = "system"
@@ -62,16 +66,15 @@ class Conversation:
                 current_content += line
 
         if current_role:
-            self._messages.append(
-                {'role': current_role, 'content': current_content})
+            self._messages.append({"role": current_role, "content": current_content})
 
         print(self._messages)
         return self._messages
 
     def save(self):
-        with open(self._filepath, 'w+') as file:
+        with open(self._filepath, "w+") as file:
             for msg in self._messages:
-                if msg['role'] != 'system':
+                if msg["role"] != "system":
                     file.write(f"### {msg['role']}\n{msg['content']}")
 
     def __len__(self):
@@ -81,27 +84,19 @@ class Conversation:
         return self._messages[position]
 
     def _add_msg(self, role, content):
-        self._messages.append(
-            {
-                "role": role,
-                "content": content
-            }
-        )
+        self._messages.append({"role": role, "content": content})
 
     def config(self, content):
-        self._messages.insert(0, {
-            'role': 'system',
-            'content': content
-        })
+        self._messages.insert(0, {"role": "system", "content": content})
 
     def user(self, content):
-        self._add_msg('user', content)
+        self._add_msg("user", content)
 
     def assistant(self, content):
-        self._add_msg('assistant', content)
+        self._add_msg("assistant", content)
 
     def system(self, content):
-        self._add_msg('system', content)
+        self._add_msg("system", content)
 
 
 class ModelAdapter:
@@ -133,7 +128,7 @@ class BaseTalk:
         return response
 
     def complete(self):
-        if self._conversation[-1]['role'] != 'assistant':
+        if self._conversation[-1]["role"] != "assistant":
             self.talk()
 
 
@@ -198,7 +193,7 @@ class DataModelDesignerTalk(BaseTalk):
             data_model_str = prisma_str
         except IndexError:
             pass
-        with open('./schema.prisma', 'w+', encoding='utf-8') as fn:
+        with open("./schema.prisma", "w+", encoding="utf-8") as fn:
             fn.write(data_model_str)
 
     def generate_samples(self):
@@ -209,9 +204,9 @@ class DataModelDesignerTalk(BaseTalk):
             json_str = response.split("```")[1]
         except IndexError:
             pass
-        with open('./samples.json', 'w+', encoding='utf-8') as fn:
+        with open("./samples.json", "w+", encoding="utf-8") as fn:
             fn.write(json.dumps(json.loads(json_str)))
-        
+
         adapter = PrismaAdapter()
-        with open('samples.json', 'r') as fn:
+        with open("samples.json", "r") as fn:
             adapter.create_samples(json.loads(fn.read()))

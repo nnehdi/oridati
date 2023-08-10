@@ -1,26 +1,30 @@
-
 from commands.Talk import DataModelDesignerTalk
 
+
 class TalkCommand:
-    def __init__(self,root_parser): 
-        talk_parser = root_parser.add_parser('talk', help="A chatbot to design and generate the datamodel by interviewing the client!")
-        talk_parser.add_argument('--complete', action='store_true')
-        talk_parser.add_argument('--generate-datamodel', action='store_true')
-        talk_parser.add_argument('--generate-samples', action='store_true')
+    def __init__(self, root_parser):
+        talk_parser = root_parser.add_parser(
+            "talk",
+            help="A chatbot to design and generate the datamodel by interviewing the client!",
+        )
+        talk_parser.add_argument("--complete", action="store_true")
+        talk_parser.add_argument("--generate-datamodel", action="store_true")
+        talk_parser.add_argument("--generate-samples", action="store_true")
         talk_parser.set_defaults(func=do)
 
+
 def do(args):
-    talk = DataModelDesignerTalk(filepath='requirements.md')
+    talk = DataModelDesignerTalk(filepath="requirements.md")
     if args.complete:
         talk.complete()
         return
     elif args.generate_datamodel:
         talk.save_data_model()
-        return 
+        return
     elif args.generate_samples:
         talk.generate_samples()
-        return 
-    
+        return
+
     exit_conditions = (":q", "quit", "exit")
     output_conditions = ("datamodel:prisma", "sample:json")
     while True:
@@ -33,6 +37,6 @@ def do(args):
             elif user_prompt == "sample:json":
                 talk.generate_samples()
         else:
-            user_prompt += '\n'
+            user_prompt += "\n"
             response = talk.talk(user_prompt)
             print(f"🪴 {response}")

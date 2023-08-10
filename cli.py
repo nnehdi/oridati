@@ -1,7 +1,7 @@
-
 from argparse import ArgumentParser
 from commands.talk_command import TalkCommand
 from commands.model_command import model_command
+
 
 class OrigamiCLI:
     def __init__(self):
@@ -10,7 +10,9 @@ class OrigamiCLI:
 
         TalkCommand(sub_parsers)
 
-        model_parser = sub_parsers.add_parser('model', help='generate and managing the models')
+        model_parser = sub_parsers.add_parser(
+            "model", help="generate and managing the models"
+        )
         model_parser.set_defaults(func=model_command)
 
     def run(self):

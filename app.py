@@ -3,7 +3,9 @@ from fastapi import FastAPI, APIRouter, Depends
 from fastapi.responses import RedirectResponse
 from collections import namedtuple
 
-RouteConfig = namedtuple('Route Config', ['methods', 'path', 'endpoint'])
+RouteConfig = namedtuple("Route Config", ["methods", "path", "endpoint"])
+
+
 def route_name(model):
     return model.__name__.lower() + "s"
 
@@ -21,8 +23,8 @@ def build_get_by_id_route(model):
 
     return RouteConfig(
         ["GET"],
-         f"/{route_name(model)}/{{record_id}}",
-         handler,
+        f"/{route_name(model)}/{{record_id}}",
+        handler,
     )
 
 
@@ -32,11 +34,11 @@ def build_del_by_id_route(model):
     ):
         return adapter.delete(model, record_id)
 
-    return RouteConfig( 
+    return RouteConfig(
         ["DELETE"],
         "/{route_name(model)}/{{record_id}}",
         handler,
-     )
+    )
 
 
 def build_get_all_route(model):
@@ -59,10 +61,11 @@ def build_create_route(model):
     ):
         return adapter.create(model, record_id, record)
 
-    return RouteConfig( 
-        ["POST"], f"/{route_name(model)}/{{record_id}}",
+    return RouteConfig(
+        ["POST"],
+        f"/{route_name(model)}/{{record_id}}",
         handler,
-     )
+    )
 
 
 ROUTES_PER_MODEL = [
@@ -83,6 +86,7 @@ def create_router(model):
 def create_root_router():
     async def redirect_docs():
         return "/docs"
+
     redirect_docs = app.get("/", response_class=RedirectResponse)(redirect_docs)
 
     root_router = APIRouter()
