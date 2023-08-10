@@ -79,7 +79,7 @@ ROUTES_PER_MODEL = [
 def create_router(model):
     model_router = APIRouter()
     for route_builder in ROUTES_PER_MODEL:
-        model_router.add_api_route(**route_builder(model))
+        model_router.add_api_route(**route_builder(model)._asdict())
     return model_router
 
 
