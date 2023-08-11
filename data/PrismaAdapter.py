@@ -1,8 +1,8 @@
 from prisma import Prisma
 import inspect
+from helpers import SingletonMeta
 
-
-class PrismaAdapter:
+class PrismaAdapter(meta=SingletonMeta):
     def __init__(self):
         self._prisma = Prisma()
         self._models = dict()
